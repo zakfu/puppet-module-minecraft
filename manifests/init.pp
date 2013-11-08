@@ -48,7 +48,7 @@ class minecraft(
 
   if $manage_curl {
     package {'curl':
-      before => S3::File["${homedir}/minecraft_server.jar"],
+      before => S3file["${homedir}/minecraft_server.jar"],
     }
   }
 
@@ -62,7 +62,7 @@ class minecraft(
     managehome => true,
   }
 
-  s3::file { "${homedir}/minecraft_server.jar":
+  s3file { "${homedir}/minecraft_server.jar":
     source  => "Minecraft.Download/versions/$version/minecraft_server.$version.jar",
     require => User[$user],
   }
@@ -100,7 +100,6 @@ class minecraft(
     owner  => $user,
     group  => $group,
     mode   => '0664',
-    content => template('minecraft/server.properties.erb'),
   } -> Minecraft::Server_prop<| |>
 
   # determine whether to use chkconfig or sysv-rc-conf package
@@ -126,7 +125,7 @@ class minecraft(
   service { 'minecraft':
     ensure    => running,
     enable    => true,
-    require   => [ File['/etc/init.d/minecraft'], S3::File["${homedir}/minecraft_server.jar"], ],
-    subscribe => S3::File["${homedir}/minecraft_server.jar"],
+    require   => [ File['/etc/init.d/minecraft'], S3File["${homedir}/minecraft_server.jar"], ],
+    subscribe => S3File["${homedir}/minecraft_server.jar"],
   }
 }
