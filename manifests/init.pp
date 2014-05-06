@@ -25,7 +25,7 @@ class minecraft(
   $user          = 'mcserver',
   $group         = 'mcserver',
   $homedir       = '/opt/minecraft',
-  $version       = '1.7.2',
+  $version       = '1.7.9',
   $manage_java   = true,
   $manage_screen = true,
   $manage_curl   = true,
@@ -62,15 +62,15 @@ class minecraft(
     managehome => true,
   }
 
-  s3file { "${homedir}/minecraft_server_$version.jar":
-    source  => "Minecraft.Download/versions/$version/minecraft_server.$version.jar",
+  s3file { "${homedir}/minecraft_server_${version}.jar":
+    source  => "Minecraft.Download/versions/${version}/minecraft_server.${version}.jar",
     require => User[$user],
   }
 
   file { "${homedir}/minecraft_server.jar":
-    ensure => link,
-    target  => "${homedir}/minecraft_server_$version.jar",
-    require => S3File["${homedir}/minecraft_server_$version.jar"],
+    ensure  => link,
+    target  => "${homedir}/minecraft_server_${version}.jar",
+    require => S3File["${homedir}/minecraft_server_${version}.jar"],
   }
 
   file { "${homedir}/ops.txt":
@@ -111,7 +111,7 @@ class minecraft(
   # determine whether to use chkconfig or sysv-rc-conf package
   $rc_config = $operatingsystem ? {
     /(Debian|Ubuntu)/ => "sysv-rc-conf",
-    default => "chkconfig",
+    default           => "chkconfig",
   }
 
   package { "$rc_config":
